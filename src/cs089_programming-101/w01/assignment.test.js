@@ -18,7 +18,7 @@ const iteration = arr => {
 
 const expected = arr => arr.reduce((acc, cur) => acc + cur, 0);
 
-describe('w01: 1차원 배열의 합을 구하는 함수를 재귀, 꼬래 재귀, 이터레이션 방식으로 구현', () => {
+describe('w01: 1차원 배열의 합을 구하는 함수를 재귀, 꼬리 재귀, 이터레이션 방식으로 구현', () => {
   const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   it('1. 재귀', () => expect(recursive(arr)).toBe(expected(arr)));
