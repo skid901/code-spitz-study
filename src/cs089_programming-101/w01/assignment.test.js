@@ -1,18 +1,18 @@
-const recursive = arr => (arr.length ? arr[0] + recursive(arr.slice(1)) : 0);
-
-const tailRecursive = (_recursive => (
-  (_recursive = (acc, _arr) =>
-    _arr.length ? _recursive(_arr[0] + acc, _arr.slice(1)) : acc),
+const recursive = (_recursive => (
+  (_recursive = (idx, arr) =>
+    idx < arr.length ? arr[idx] + _recursive(idx + 1, arr) : 0),
   arr => _recursive(0, arr)
 ))();
 
+const tailRecursive = (_recursive => (
+  (_recursive = (acc, idx, arr) =>
+    idx < arr.length ? _recursive(acc + arr[idx], idx + 1, arr) : acc),
+  arr => _recursive(0, 0, arr)
+))();
+
 const iteration = arr => {
-  let acc, _arr;
-  for (
-    acc = 0, _arr = arr;
-    _arr.length;
-    acc = _arr[0] + acc, _arr = _arr.slice(1)
-  );
+  let acc, idx;
+  for (acc = 0, idx = 0; idx < arr.length; acc = acc + arr[idx], idx = idx + 1);
   return acc;
 };
 
