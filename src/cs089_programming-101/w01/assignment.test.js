@@ -1,18 +1,20 @@
 const recursive = (_recursive => (
-  (_recursive = (idx, arr) =>
-    idx < arr.length ? arr[idx] + _recursive(idx + 1, arr) : 0),
-  arr => _recursive(0, arr)
+  (_recursive = (arr, idx) =>
+    idx < arr.length ? arr[idx] + _recursive(arr, idx + 1) : 0),
+  arr => _recursive(arr, 0)
 ))();
 
 const tailRecursive = (_recursive => (
-  (_recursive = (acc, idx, arr) =>
-    idx < arr.length ? _recursive(acc + arr[idx], idx + 1, arr) : acc),
-  arr => _recursive(0, 0, arr)
+  (_recursive = (arr, idx, acc) =>
+    idx < arr.length ? _recursive(arr, idx + 1, acc + arr[idx]) : acc),
+  arr => _recursive(arr, 0, 0)
 ))();
 
 const iteration = arr => {
   let acc, idx;
-  for (acc = 0, idx = 0; idx < arr.length; acc = acc + arr[idx], idx = idx + 1);
+  for (acc = 0, idx = 0; idx < arr.length; idx = idx + 1) {
+    acc = acc + arr[idx];
+  }
   return acc;
 };
 
