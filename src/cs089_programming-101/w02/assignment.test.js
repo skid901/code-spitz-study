@@ -1,27 +1,29 @@
-const escapes = {
-  '"': '\\"',
-  '\\': '\\',
-  '/': '\\/',
-  '\b': '\\b',
-  '\f': '\\f',
-  '\n': '\\n',
-  '\r': '\\r',
-  '\t': '\\t',
+const myJSON = {
+  number: v => (isFinite(v) ? v.toString() : 'null'),
+  string: v => '"' + escapeChk.convert(v) + '"',
+  boolean: v => v.toString(),
+  null: v => 'null',
+  stringify(v) {
+    return (this[typeof v] ?? this['null'])(v);
+  },
 };
 
-const convertEscape = chr => (chr in escapes ? escapes[chr] : chr);
-
-const primStringify = primitive => {
-  switch (typeof primitive) {
-    case 'number':
-      return isFinite(primitive) ? '' + primitive : 'null';
-    case 'string':
-      return '"' + [...primitive].map(convertEscape).join('') + '"';
-    case 'boolean':
-      return primitive ? 'true' : 'false';
-    default:
-      return 'null';
-  }
+const escapeChk = {
+  data: {
+    '"': '\\"',
+    '\\': '\\',
+    '/': '\\/',
+    '\b': '\\b',
+    '\f': '\\f',
+    '\n': '\\n',
+    '\r': '\\r',
+    '\t': '\\t',
+  },
+  convert(str) {
+    let acc = '';
+    for (const chr of str) acc += this.data[chr] ?? chr;
+    return acc;
+  },
 };
 
 const err = msg => {
@@ -31,7 +33,9 @@ const err = msg => {
 const recursive = (_recursive => (
   (_recursive = (arr, idx) =>
     idx < arr.length
-      ? (idx ? ',' : '[') + primStringify(arr[idx]) + _recursive(arr, idx + 1)
+      ? (idx ? ',' : '[') +
+        myJSON.stringify(arr[idx]) +
+        _recursive(arr, idx + 1)
       : ']'),
   arr =>
     !Array.isArray(arr)
@@ -47,7 +51,7 @@ const tailRecursive = (_recursive => (
       ? _recursive(
           arr,
           idx + 1,
-          acc + (idx ? ',' : '[') + primStringify(arr[idx]),
+          acc + (idx ? ',' : '[') + myJSON.stringify(arr[idx]),
         )
       : acc + ']'),
   arr =>
@@ -63,7 +67,7 @@ const iteration = arr => {
   if (arr.length) {
     let idx, acc;
     for (idx = 0, acc = ''; idx < arr.length; idx = idx + 1) {
-      acc = acc + (idx ? ',' : '[') + primStringify(arr[idx]);
+      acc = acc + (idx ? ',' : '[') + myJSON.stringify(arr[idx]);
     }
     return acc + ']';
   } else return '[]';
