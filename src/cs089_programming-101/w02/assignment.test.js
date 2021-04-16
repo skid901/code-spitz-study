@@ -24,12 +24,21 @@ const primStringify = primitive => {
   }
 };
 
+const err = msg => {
+  throw msg;
+};
+
 const recursive = (_recursive => (
   (_recursive = (arr, idx) =>
     idx < arr.length
       ? (idx ? ',' : '[') + primStringify(arr[idx]) + _recursive(arr, idx + 1)
       : ']'),
-  arr => _recursive(arr, 0)
+  arr =>
+    !Array.isArray(arr)
+      ? err('invalid array')
+      : arr.length
+      ? _recursive(arr, 0)
+      : '[]'
 ))();
 
 const tailRecursive = (_recursive => (
@@ -41,15 +50,23 @@ const tailRecursive = (_recursive => (
           acc + (idx ? ',' : '[') + primStringify(arr[idx]),
         )
       : acc + ']'),
-  arr => _recursive(arr, 0, '')
+  arr =>
+    !Array.isArray(arr)
+      ? err('invalid array')
+      : arr.length
+      ? _recursive(arr, 0, '')
+      : '[]'
 ))();
 
 const iteration = arr => {
-  let idx, acc;
-  for (idx = 0, acc = ''; idx < arr.length; idx = idx + 1) {
-    acc = acc + (idx ? ',' : '[') + primStringify(arr[idx]);
-  }
-  return acc + ']';
+  if (!Array.isArray(arr)) err('invalid array');
+  if (arr.length) {
+    let idx, acc;
+    for (idx = 0, acc = ''; idx < arr.length; idx = idx + 1) {
+      acc = acc + (idx ? ',' : '[') + primStringify(arr[idx]);
+    }
+    return acc + ']';
+  } else return '[]';
 };
 
 const expected = arr => JSON.stringify(arr);
@@ -67,9 +84,18 @@ describe('w02: Array -> JSON String 함수를 재귀, 꼬리 재귀, 이터레�
     Symbol(),
   ];
 
-  it('1. 재귀', () => expect(recursive(arr)).toBe(expected(arr)));
+  it('1. 재귀', () => {
+    expect(recursive(arr)).toBe(expected(arr));
+    expect(recursive([])).toBe(expected([]));
+  });
 
-  it('2. 꼬리 재귀', () => expect(tailRecursive(arr)).toBe(expected(arr)));
+  it('2. 꼬리 재귀', () => {
+    expect(tailRecursive(arr)).toBe(expected(arr));
+    expect(tailRecursive([])).toBe(expected([]));
+  });
 
-  it('3. 이터레이션', () => expect(iteration(arr)).toBe(expected(arr)));
+  it('3. 이터레이션', () => {
+    expect(iteration(arr)).toBe(expected(arr));
+    expect(iteration([])).toBe(expected([]));
+  });
 });
